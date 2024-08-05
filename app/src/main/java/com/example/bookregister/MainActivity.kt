@@ -1,6 +1,7 @@
 package com.example.bookregister
 
 import android.os.Bundle
+import android.os.Environment
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -35,9 +37,15 @@ import io.ktor.client.statement.HttpResponse
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.jsonArray
+import java.io.File
+import java.io.FileOutputStream
+import java.io.OutputStreamWriter
+
+var csvData = ""
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -93,6 +101,23 @@ fun CameraView() {
                 Text(text = it.summary.title)
                 Text(text = "${it.summary.author}, ${it.summary.publisher}")
             }
+            Button(onClick = {
+                payload?.let { bookData ->
+                    bookDataToCsv(bookData)
+                }
+            }) {
+                Text("Save")
+            }
+            Button(onClick = {
+                csvData = ""
+            }) {
+                Text("Clear")
+            }
+            Button(onClick = {
+                saveCsvToFile(csvData)
+            }) {
+                Text("Save to CSV")
+            }
         }
     }
     LaunchedEffect(barcodeValue) {
@@ -114,4 +139,24 @@ private suspend fun fetchJSON(isbnCode: String?): BookData {
     val jsonObject = Json.parseToJsonElement(jsonString).jsonArray[0]
     val result = json.decodeFromJsonElement<BookData>(jsonObject)
     return result
+}
+
+fun bookDataToCsv(bookData: BookData) {
+    val data = with(bookData.summary) {
+        "$isbn,$title,$publisher,$author"
+    }
+    csvData += "$data\n"
+}
+
+fun saveCsvToFile(csvData: String, fileName: String = "book_data.txt") {
+    val documentsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS)
+    if (!documentsDir.exists()) {
+        documentsDir.mkdirs()
+    }
+    val file = File(documentsDir, fileName)
+    FileOutputStream(file).use { output ->
+        OutputStreamWriter(output, "UTF-8").use { writer ->
+            writer.write(csvData)
+        }
+    }
 }

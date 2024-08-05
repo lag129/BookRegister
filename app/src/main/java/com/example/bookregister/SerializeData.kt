@@ -2,7 +2,6 @@
 
 package com.example.bookregister
 
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
