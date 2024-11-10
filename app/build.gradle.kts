@@ -1,13 +1,14 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
     id("org.jetbrains.kotlin.plugin.serialization")
     id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
     namespace = "com.example.bookregister"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.example.bookregister"
@@ -41,9 +42,6 @@ android {
     buildFeatures {
         compose = true
     }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.14"
-    }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
@@ -72,15 +70,15 @@ dependencies {
     implementation(libs.androidx.camera.camera2)
     implementation(libs.androidx.camera.lifecycle)
     implementation(libs.androidx.camera.view)
-    implementation("com.github.tbsten:camerax-compose:0.0.2")
+    implementation(libs.camerax.compose)
     // ML Kit
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    implementation(libs.barcode.scanning)
     // Ktor
     implementation(libs.ktor.client.android)
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.gson)
     // Kotlin Serialization
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    implementation(libs.kotlinx.serialization.json)
     // Coroutines
     implementation(libs.kotlinx.coroutines.android)
     // ViewModel
